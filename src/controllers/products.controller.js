@@ -1,20 +1,14 @@
-const products = [
-    { id: 1, name: "Product 1", price: 10, active: true },
-    { id: 2, name: "Product 2", price: 20, active: true },
-    { id: 3, name: "Product 3", price: 30, active: true },
-];
-
-import { getAllProductsModel } from "../models/Product.model.js";
+import { getAllProductsModel, getProductByIdModel, postProductModel, putProductModel, physicalDeleteProductModel, logicalDeleteProductModel } from "../models/Product.model.js";
 
 export const getProproducts = async (req, res) => {
     const products = await getAllProductsModel();
     res.json(products);
 };
 
-export const getProductById = (req, res) => {
+export const getProductById = async (req, res) => {
 
     const { id } = req.params;
-    const product = products.find((product) => product.id === Number(id));
+    const product = await getProductByIdModel(id);
 
     if (!product) {
         return res.status(404).json({
@@ -25,24 +19,24 @@ export const getProductById = (req, res) => {
     return res.json(product);
 };
 
-export const createProduct = (req, res) => {
-    const { name, price } = req.body;
+export const createProduct = async (req, res) => {
+    const { title, price } = req.body;
 
-    if (!name && !price) {
+    if (!title && !price) {
         return res.status(422).json({
-            messages: "Name and Price are required"
+            messages: "title and Price are required"
         })
     }
 
-    if (!name) {
+    if (!title) {
         return res.status(422).json({
-            message: "Name are required",
+            message: "title are required",
         });
     };
 
-    if (typeof name !== "string") {
+    if (typeof title !== "string") {
         return res.status(422).json({
-            message: "Name must be a string",
+            message: "title must be a string",
         });
     };
 
@@ -58,13 +52,10 @@ export const createProduct = (req, res) => {
         })
     };
 
-    const newProduct = {
-        id: products.length + 1,
-        name,
-        price,
-    };
-
-    products.push(newProduct);
+    const newProduct = await postProductModel({
+        title,
+        price
+    })
 
     return res.status(201).json({
         message: "Product created",
@@ -72,33 +63,25 @@ export const createProduct = (req, res) => {
     });
 };
 
-export const updateProduct = (req, res) => {
+export const updateProduct = async (req, res) => {
     const { id } = req.params;
-    const { name, price } = req.body;
+    const { title, price } = req.body;
 
-    const product = products.find((product) => product.id === Number(id));
-
-    if (!product) {
-        return res.status(404).json({
-            message: "Category not found",
-        });
-    }
-    
-    if (!name && !price) {
+    if (!title && !price) {
         return res.status(422).json({
-            messages: "Name and Price are required"
+            messages: "title and Price are required"
         })
     }
 
-    if (!name) {
+    if (!title) {
         return res.status(422).json({
-            message: "Name are required",
+            message: "title are required",
         });
     };
 
-    if (typeof name !== "string") {
+    if (typeof title !== "string") {
         return res.status(422).json({
-            message: "Name must be a string",
+            message: "title must be a string",
         });
     };
 
@@ -114,48 +97,56 @@ export const updateProduct = (req, res) => {
         })
     };
 
-    product.name = name;
-    product.price = price;
+    const updateProduct = await putProductModel(id, {
+        title,
+        price
+    })
+
+    if(!updateProduct) {
+        return res.status(404).json({ message:"Product not found" })
+    }
 
     return res.status(202).json({
-        message:`Product update id: ${ id } with new name: ${name}, and new price: ${price}`,
+        message:`Product update id: ${ id } with new title: ${title}, and new price: ${price}`,
     })
 };
 
-export const physicalDeleteProduct = (req, res) => {
+export const physicalDeleteProduct = async (req, res) => {
     const { id } = req.params; 
 
-    const product = products.find((product) => product.id === Number(id));
+    const deletedProduct = await physicalDeleteProductModel(id)
 
-    if (!product) {
+    if (!deletedProduct) {
         return res.status(404).json({
             message: "Prouct not found"
         })
     }
-
-        const deletedProduct = products.splice(products.indexOf(product), 1);
         
     return res.status(202).json({
             message: "Product deleted",
-            product: deletedProduct[0],
+            product: deletedProduct,
         })
 };
 
-export const logicalDeleteProduct =  ( req, res) => {
+export const logicalDeleteProduct = async (req, res) => {
     const { id } = req.params;
 
-    const product = products.find((product) => product.id === Number(id));
+    const product = await getProductByIdModel(id);
 
     if (!product) {
         return res.status(404).json({
             message: "Product not found"
-        })
+        });
     }
 
-    const productStatus = product.active === true ? product.active = false : product.active = true;
+    const newStatus = !product.active;
 
-    return res.status(202).json({
-        message: "Product updated",
-        product: productStatus,
+    await logicalDeleteProductModel(id, {
+        active: newStatus
+    });
+
+    return res.status(200).json({
+        message: "Status updated",
+        actual_status: newStatus
     });
 };

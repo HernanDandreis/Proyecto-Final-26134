@@ -12,9 +12,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/products', productsRouter);
-app.use('/api/auth')
+//app.use('/api/auth')
 
 app.use(endpointNotFoundMiddleware);
 
 app.listen(PORT, () => console.log('Server started on http://localhost:' + PORT));
-
