@@ -20,13 +20,7 @@ export const getProductById = async (req, res) => {
 };
 
 export const createProduct = async (req, res) => {
-    const { title, price } = req.body;
-
-    if (!title && !price) {
-        return res.status(422).json({
-            messages: "title and Price are required"
-        })
-    }
+    const { title, price,  description, stock, active} = req.body;
 
     if (!title) {
         return res.status(422).json({
@@ -52,9 +46,60 @@ export const createProduct = async (req, res) => {
         })
     };
 
+    if(price <= 0) {
+            return res.status(422).json({
+            message: "Prices must be greater than 0"
+        })
+    }
+
+    if (!description) {
+        return res.status(422).json({
+            message: "description are required",
+        });
+    };
+
+    if (typeof description !== "string") {
+        return res.status(422).json({
+            message: "description must be a string",
+        });
+    };
+
+    if (!stock) {
+        return res.status(422).json({
+            message: "stock are required",
+        });
+    };
+
+    if (typeof stock !== "number") {
+        return res.status(422).json({
+            message: "stock must be a number",
+        });
+    };
+
+    if(stock <= 0) {
+            return res.status(422).json({
+            message: "Stock must be greater than 0"
+        })
+    }
+
+    if (!active) {
+        return res.status(422).json({
+            message: "active status are required",
+        });
+    };
+
+    if (typeof active !== "boolean") {
+        return res.status(422).json({
+            message: "title must be a string",
+        });
+    };
+
     const newProduct = await postProductModel({
         title,
-        price
+        price,
+        description,
+        stock,
+        active
     })
 
     return res.status(201).json({
@@ -65,13 +110,7 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     const { id } = req.params;
-    const { title, price } = req.body;
-
-    if (!title && !price) {
-        return res.status(422).json({
-            messages: "title and Price are required"
-        })
-    }
+    const { title, price,  description, stock, active} = req.body;
 
     if (!title) {
         return res.status(422).json({
@@ -97,9 +136,60 @@ export const updateProduct = async (req, res) => {
         })
     };
 
+    if(price <= 0) {
+            return res.status(422).json({
+            message: "Prices must be greater than 0"
+        })
+    }
+
+    if (!description) {
+        return res.status(422).json({
+            message: "description are required",
+        });
+    };
+
+    if (typeof description !== "string") {
+        return res.status(422).json({
+            message: "description must be a string",
+        });
+    };
+
+    if (!stock) {
+        return res.status(422).json({
+            message: "stock are required",
+        });
+    };
+
+    if (typeof stock !== "number") {
+        return res.status(422).json({
+            message: "stock must be a number",
+        });
+    };
+
+    if(stock <= 0) {
+            return res.status(422).json({
+            message: "Stock must be greater than 0"
+        })
+    }
+
+    if (!active) {
+        return res.status(422).json({
+            message: "active status are required",
+        });
+    };
+
+    if (typeof active !== "boolean") {
+        return res.status(422).json({
+            message: "title must be a string",
+        });
+    };
+
     const updateProduct = await putProductModel(id, {
         title,
-        price
+        price,
+        description,
+        stock,
+        active
     })
 
     if(!updateProduct) {
@@ -107,7 +197,7 @@ export const updateProduct = async (req, res) => {
     }
 
     return res.status(202).json({
-        message:`Product update id: ${ id } with new title: ${title}, and new price: ${price}`,
+        message:`Product update id: ${ id }`,
     })
 };
 

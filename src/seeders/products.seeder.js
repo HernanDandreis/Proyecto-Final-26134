@@ -21,11 +21,11 @@ async function seedProducts(quantity) {
         await batch.commit();
 
         console.log(`✅ ${quantity} products created`);
-        fs.writeFileSync ('./src/logs/productSeeder.txt',`✅ ${quantity} products created at ${new Date()}\n`, { flag: 'a' })
+        fs.writeFileSync ('./src/logs/productSeeder.log',`✅ ${quantity} products created at ${new Date()}\n`, { flag: 'a' })
         process.exit(0);
     } catch (error) {
         console.error('❌ Error creating products:', error);
-        fs.writeFileSync ('./src/logs/productSeeder.txt',`❌ Error creating products:, error\n`, { flag: 'a' })
+        fs.writeFileSync ('./src/logs/productSeeder.log',`❌ Error creating products:, error\n`, { flag: 'a' })
         process.exit(1);
     }
 }

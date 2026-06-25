@@ -47,11 +47,6 @@ export const postProductModel = async (product) => {
 
     return {
         id: productRef.id,
-        title: productRef.title,
-        price: productRef.price,
-        description: productRef.description,
-        stock: productRef.stock,
-        active: productRef.active,
         ...product
     }
 }

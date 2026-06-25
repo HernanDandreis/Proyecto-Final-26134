@@ -10,7 +10,6 @@ export function productsFactory(overrides = {}) {
             min: 0,
             max: 100,
         }),
-        active: true,
         ...overrides,
     };
 }
